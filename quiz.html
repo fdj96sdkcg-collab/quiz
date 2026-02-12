@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Test Dopasowania</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            padding: 30px;
+            box-shadow: 0 30px 70px rgba(0,0,0,0.3);
+            max-width: 700px;
+            width: 100%;
+            backdrop-filter: blur(10px);
+        }
+        
+        h1 {
+            font-size: 48px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 20px;
+            margin-bottom: 40px;
+            font-style: italic;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 100%);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            border-radius: 50px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            margin-top: 20px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+        }
+        
+        .step {
+            display: none;
+        }
+        
+        .step.active {
+            display: block;
+        }
+        
+        .welcome {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .question-card {
+            background: #f9f9f9;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border-left: 8px solid #4ecdc4;
+        }
+        
+        .question-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2d3436;
+            margin-bottom: 20px;
+        }
+        
+        .answer-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .input-number {
+            background: #4ecdc4;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+        }
+        
+        input {
+            flex: 1;
+            padding: 12px 18px;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #4ecdc4;
+        }
+        
+        .add-answer {
+            background: none;
+            border: 2px dashed #4ecdc4;
+            color: #4ecdc4;
+            padding: 10px;
+            border-radius: 15px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 5px;
+            transition: all 0.3s;
+        }
+        
+        .add-answer:hover {
+            background: #4ecdc4;
+            color: white;
+        }
+        
+        .result-badge {
+            font-size: 80px;
+            font-weight: 900;
+            text-align: center;
+            margin: 30px 0;
+            padding: 30px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .match-message {
+            font-size: 32px;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            background: #f0f0f0;
+            border-radius: 20px;
+            color: #2d3436;
+        }
+        
+        .answers-table {
+            margin-top: 30px;
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        
+        .answer-row {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 8px solid;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+        }
+        
+        .answer-row.correct {
+            border-left-color: #00b894;
+            background: #e8f5e9;
+        }
+        
+        .answer-row.wrong {
+            border-left-color: #d63031;
+            background: #ffebee;
+        }
+        
+        .question-text {
+            font-weight: bold;
+            color: #2d3436;
+            margin-bottom: 8px;
+        }
+        
+        .answers-compare {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            color: #636e72;
+        }
+        
+        .correct-answer {
+            color: #00b894;
+            font-weight: 600;
+        }
+        
+        .wrong-answer {
+            color: #d63031;
+            font-weight: 600;
+        }
+        
+        .icon {
+            font-size: 24px;
+        }
+        
+        .progress {
+            text-align: center;
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+        
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 100%);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Krok 1: Strona powitalna -->
+        <div id="step0" class="step active welcome">
+            <h1>TEST DOPASOWANIA</h1>
+            <div class="subtitle">
+                ⭐ Sprawdź, jak dobrze znasz drugą osobę! ⭐
+            </div>
+            <div style="font-size: 60px; margin: 40px 0;">💑</div>
+            <p style="font-size: 18px; color: #555; margin-bottom: 30px;">
+                Osoba 1 odpowiada na pytania<br>
+                Osoba 2 zgaduje odpowiedzi<br>
+                Zobaczcie, czy jesteście sobie pisani! 💘
+            </p>
+            <button class="btn" onclick="nextStep(1)">👉 ZACZYNAMY! 👈</button>
+        </div>
+
+        <!-- Krok 2: Pytania dla Osoby 1 -->
+        <div id="step1" class="step">
+            <div class="progress">Osoba 1: Wpisz swoje odpowiedzi</div>
+            <div id="questions-container"></div>
+            <button class="btn" onclick="savePerson1()">✅ Zapisz odpowiedzi - przejdź do osoby 2</button>
+        </div>
+
+        <!-- Krok 3: Pytania dla Osoby 2 -->
+        <div id="step2" class="step">
+            <div class="progress">Osoba 2: Zgadnij odpowiedzi Osoby 1</div>
+            <div id="guess-container"></div>
+            <button class="btn" onclick="checkAnswers()">🎯 Sprawdź dopasowanie!</button>
+        </div>
+
+        <!-- Krok 4: Wynik -->
+        <div id="step3" class="step">
+            <h1 style="font-size: 36px; margin-bottom: 10px;">WYNIK</h1>
+            <div id="percentageDisplay" class="result-badge">0%</div>
+            <div id="matchMessage" class="match-message"></div>
+            
+            <div style="margin: 30px 0;">
+                <h2 style="color: #2d3436; margin-bottom: 20px;">📊 Szczegółowa analiza:</h2>
+                <div id="details" class="answers-table"></div>
+            </div>
+            
+            <button onclick="restart()" class="btn" style="background: #636e72; margin-top: 20px;">🔄 Nowy test</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            "🍝 Ulubione danie",
+            "🎵 Ulubiony artysta",
+            "🎭 Ulubiony aktor",
+            "🎵 Ulubiona piosenka (artysta - tytuł)",
+            "🎬 Ulubiony film",
+            "📺 Ulubiony serial",
+            "🏠 Ulubione danie w domu",
+            "🍽️ Ulubiona restauracja",
+            "🛋️ Ulubiona aktywność w domu",
+            "🥨 Ulubiona przekąska słona",
+            "🍫 Ulubiony słodycz",
+            "✈️ Kraje które chcesz zwiedzić",
+            "🎮 Ulubiona gra",
+            "🦁 Gdybym był(a) zwierzęciem to jakim",
+            "⚡ Jaka supermoc bym chciał(a)",
+            "😅 Moja wada",
+            "🌟 Moja zaleta",
+            "🍦 Ulubione lody",
+            "💼 Jaką pracę marzeń bym wybrał(a) gdyby pieniądze nie miały znaczenia",
+            "🚫 Czego nie lubię robić"
+        ];
+
+        let person1Answers = [];
+
+        function nextStep(step) {
+            document.getElementById('step0').classList.remove('active');
+            document.getElementById('step1').classList.remove('active');
+            document.getElementById('step2').classList.remove('active');
+            document.getElementById('step3').classList.remove('active');
+            
+            if(step === 1) {
+                document.getElementById('step1').classList.add('active');
+                renderQuestions();
+            } else if(step === 2) {
+                document.getElementById('step2').classList.add('active');
+                renderGuessQuestions();
+            }
+        }
+
+        function renderQuestions() {
+            let html = '';
+            questions.forEach((q, index) => {
+                html += `
+                    <div class="question-card">
+                        <div class="question-title">${q}</div>
+                        <div class="answer-inputs" id="q${index}_container">
+                            <div class="input-group">
+                                <span class="input-number">1</span>
+                                <input type="text" id="q${index}_a1" placeholder="Odpowiedź 1" value="${person1Answers[index]?.[0] || ''}">
+                            </div>
+                            <div class="input-group">
+                                <span class="input-number">2</span>
+                                <input type="text" id="q${index}_a2" placeholder="Odpowiedź 2 (opcjonalnie)" value="${person1Answers[index]?.[1] || ''}">
+                            </div>
+                            <div class="input-group">
+                                <span class="input-number">3</span>
+                                <input type="text" id="q${index}_a3" placeholder="Odpowiedź 3 (opcjonalnie)" value="${person1Answers[index]?.[2] || ''}">
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('questions-container').innerHTML = html;
+        }
+
+        function renderGuessQuestions() {
+            let html = '';
+            questions.forEach((q, index) => {
+                html += `
+                    <div class="question-card">
+                        <div class="question-title">${q}</div>
+                        <div class="answer-inputs" id="guess${index}_container">
+                            <div class="input-group">
+                                <span class="input-number">1</span>
+                                <input type="text" id="guess${index}_a1" placeholder="Twoja odpowiedź 1">
+                            </div>
+                            <div class="input-group">
+                                <span class="input-number">2</span>
+                                <input type="text" id="guess${index}_a2" placeholder="Twoja odpowiedź 2 (opcjonalnie)">
+                            </div>
+                            <div class="input-group">
+                                <span class="input-number">3</span>
+                                <input type="text" id="guess${index}_a3" placeholder="Twoja odpowiedź 3 (opcjonalnie)">
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('guess-container').innerHTML = html;
+        }
+
+        function savePerson1() {
+            person1Answers = [];
+            
+            questions.forEach((_, index) => {
+                let answers = [];
+                let a1 = document.getElementById(`q${index}_a1`)?.value.trim();
+                let a2 = document.getElementById(`q${index}_a2`)?.value.trim();
+                let a3 = document.getElementById(`q${index}_a3`)?.value.trim();
+                
+                if(a1) answers.push(a1);
+                if(a2) answers.push(a2);
+                if(a3) answers.push(a3);
+                
+                person1Answers.push(answers);
+            });
+            
+            nextStep(2);
+        }
+
+        function normalizeString(str) {
+            if (!str) return '';
+            return str.toLowerCase()
+                .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // usuń polskie znaki
+                .replace(/[^\w\s]/g, ' ') // zamień interpunkcję na spacje
+                .replace(/\s+/g, ' ') // usuń nadmiarowe spacje
+                .trim();
+        }
+
+        function checkIfMatches(correctAnswers, guess) {
+            if (!guess || correctAnswers.length === 0) return false;
+            
+            let normalizedGuess = normalizeString(guess);
+            if (normalizedGuess === '') return false;
+            
+            // Podziel odpowiedź na słowa
+            let guessWords = normalizedGuess.split(' ');
+            
+            for (let correct of correctAnswers) {
+                let normalizedCorrect = normalizeString(correct);
+                
+                // Sprawdź czy któreś słowo z odpowiedzi pasuje
+                for (let word of guessWords) {
+                    if (word.length > 2 && normalizedCorrect.includes(word)) {
+                        return true;
+                    }
+                }
+                
+                // Sprawdź czy odpowiedź zawiera główne słowa
+                let correctWords = normalizedCorrect.split(' ');
+                for (let word of correctWords) {
+                    if (word.length > 2 && normalizedGuess.includes(word)) {
+                        return true;
+                    }
+                }
+            }
+            
+            return false;
+        }
+
+        function checkAnswers() {
+            let score = 0;
+            let totalQuestions = questions.length;
+            let details = [];
+
+            questions.forEach((question, index) => {
+                let correctAnswers = person1Answers[index] || [];
+                
+                // Pobierz odpowiedzi osoby 2
+                let guess1 = document.getElementById(`guess${index}_a1`)?.value || '';
+                let guess2 = document.getElementById(`guess${index}_a2`)?.value || '';
+                let guess3 = document.getElementById(`guess${index}_a3`)?.value || '';
+                
+                let guesses = [guess1, guess2, guess3].filter(g => g.trim() !== '');
+                
+                // Sprawdź czy któraś z odpowiedzi pasuje
+                let isCorrect = false;
+                for (let guess of guesses) {
+                    if (checkIfMatches(correctAnswers, guess)) {
+                        isCorrect = true;
+                        break;
+                    }
+                }
+                
+                if (isCorrect) score++;
+                
+                // Przygotuj szczegóły do wyświetlenia
+                let correctAnswersText = correctAnswers.length > 0 ? correctAnswers.join(' | ') : 'Brak odpowiedzi';
+                let guessText = guesses.length > 0 ? guesses.join(' | ') : 'Brak odpowiedzi';
+                
+                details.push({
+                    question: question,
+                    correct: correctAnswersText,
+                    guess: guessText,
+                    isCorrect: isCorrect
+                });
+            });
+
+            let percentage = Math.round((score / totalQuestions) * 100);
+            
+            // Wyświetl wynik
+            document.getElementById('percentageDisplay').innerHTML = percentage + '%';
+            
+            // Wynik z opisem
+            let message = '';
+            if (percentage === 100) message = '💀 UMZRECIE RAZEM! 💀';
+            else if (percentage >= 90) message = '🔥 Znacie się jak wlasna kieszen! 🔥';
+            else if (percentage >= 80) message = '🎭 Znacie sie jak Siudy na waleniu w chuja! 🎭';
+            else if (percentage >= 70) message = '🥜 Jak dzem i maslo orzechowe! 🍞';
+            else if (percentage >= 60) message = '👍 Cos tam sie znacie! 👍';
+            else if (percentage >= 50) message = '😐 Ujdzie... 😐';
+            else if (percentage >= 40) message = '💔 Nie wroze wam przyszlosci! 💔';
+            else if (percentage >= 30) message = '⚖️ Mozecie wnosic o rozwod! ⚖️';
+            else if (percentage >= 20) message = '🚫 Separacja! 🚫';
+            else if (percentage >= 10) message = '📦 Mozecie sie juz wyprowadzac! 📦';
+            else message = '😬 Bruh... 😬';
+            
+            document.getElementById('matchMessage').innerHTML = message;
+            
+            // Wyświetl szczegółową tabelę
+            let detailsHtml = '';
+            details.forEach(item => {
+                detailsHtml += `
+                    <div class="answer-row ${item.isCorrect ? 'correct' : 'wrong'}">
+                        <div class="question-text">❓ ${item.question}</div>
+                        <div class="answers-compare">
+                            <span style="flex: 1;">
+                                <span style="color: #2d3436; font-weight: 600;">🎯 Osoba 1:</span> 
+                                <span class="correct-answer">${item.correct}</span>
+                            </span>
+                            <span style="flex: 1;">
+                                <span style="color: #2d3436; font-weight: 600;">🤔 Osoba 2:</span> 
+                                <span class="${item.isCorrect ? 'correct-answer' : 'wrong-answer'}">${item.guess}</span>
+                            </span>
+                            <span class="icon">${item.isCorrect ? '✅' : '❌'}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            document.getElementById('details').innerHTML = detailsHtml;
+            
+            // Przejdź do wyniku
+            document.getElementById('step1').classList.remove('active');
+            document.getElementById('step2').classList.remove('active');
+            document.getElementById('step3').classList.add('active');
+        }
+
+        function restart() {
+            // Wyczyść wszystko
+            person1Answers = [];
+            
+            // Wyczyść wszystkie inputy
+            const inputs = document.querySelectorAll('input');
+            inputs.forEach(input => input.value = '');
+            
+            // Wróć do strony powitalnej
+            document.getElementById('step0').classList.add('active');
+            document.getElementById('step1').classList.remove('active');
+            document.getElementById('step2').classList.remove('active');
+            document.getElementById('step3').classList.remove('active');
+        }
+    </script>
+</body>
+</html>
